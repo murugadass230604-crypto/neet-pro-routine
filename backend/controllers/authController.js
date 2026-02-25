@@ -30,13 +30,18 @@ const transporter = nodemailer.createTransport({
 console.log("BREVO_USER:", process.env.BREVO_USER);
 console.log("BREVO_PASS exists:", !!process.env.BREVO_PASS);
 
-transporter.verify((error, success) => {
-  if (error) {
-    console.log("❌ SMTP Error:", error);
-  } else {
-    console.log("✅ SMTP Server is ready");
-  }
-});
+// ==========================
+// SMTP VERIFY (ONLY IN DEV)
+// ==========================
+if (process.env.NODE_ENV !== "production") {
+  transporter.verify((error, success) => {
+    if (error) {
+      console.log("❌ SMTP Error:", error);
+    } else {
+      console.log("✅ SMTP Server is ready");
+    }
+  });
+}
 
 // ==========================
 // 📧 SEND SIGNUP OTP
@@ -71,7 +76,7 @@ const sendOtp = async (req, res) => {
     await user.save();
 
 await transporter.sendMail({
-  from: `"NEET Pro" <dassgame2327@gmail.com>`,
+  from: `"NEET Pro" <a35375001@smtp-brevo.com>`,
   to: email,
   subject: "NEET Pro Signup OTP",
   html: `<h2>Your OTP: ${otp}</h2><p>Valid for 5 minutes</p>`
@@ -284,7 +289,7 @@ const sendResetOtp = async (req, res) => {
     await user.save();
 
     await transporter.sendMail({
-      from: `"NEET Pro" <${process.env.EMAIL_USER}>`,
+      from: `"NEET Pro" <${process.env.BREVO_USER}>`,
       to: email,
       subject: "Password Reset OTP",
       html: `<h2>Your Reset OTP: ${otp}</h2>`
