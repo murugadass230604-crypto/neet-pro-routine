@@ -1,0 +1,194 @@
+/* ============================= */
+/* 🌍 ROOT SETTINGS */
+/* ============================= */
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --primary: #6366f1;
+  --secondary: #10b981;
+  --bg-dark: #0f172a;
+  --card-dark: #1e293b;
+  --hover-dark: #334155;
+  --danger: #ef4444;
+}
+
+/* ============================= */
+/* 🔄 RESET */
+/* ============================= */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* ============================= */
+/* 🖥 BODY */
+/* ============================= */
+
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: var(--bg-dark);
+  color: white;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ============================= */
+/* 📱 RESPONSIVE CONTAINER */
+/* ============================= */
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin: auto;
+  padding: 20px;
+}
+
+/* ============================= */
+/* 🧱 LAYOUT */
+/* ============================= */
+
+.app-layout {
+  display: flex;
+  min-height: 100vh;
+}
+
+.page-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* Mobile sidebar fix */
+@media (max-width: 768px) {
+  .app-layout {
+    flex-direction: column;
+  }
+
+  .page-content {
+    padding: 15px;
+  }
+}
+
+/* ============================= */
+/* 🔗 LINKS */
+/* ============================= */
+
+a {
+  text-decoration: none;
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: 0.2s ease;
+}
+
+a:hover {
+  color: var(--primary);
+}
+
+/* ============================= */
+/* 🔘 BUTTONS */
+/* ============================= */
+
+button {
+  border-radius: 8px;
+  border: none;
+  padding: 10px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  background: var(--card-dark);
+  color: white;
+  transition: 0.2s ease;
+}
+
+button:hover {
+  background: var(--hover-dark);
+}
+
+/* Primary Button */
+.btn-primary {
+  background: var(--primary);
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+}
+
+/* Success Button */
+.btn-success {
+  background: var(--secondary);
+}
+
+/* Danger Button */
+.btn-danger {
+  background: var(--danger);
+}
+
+/* ============================= */
+/* 🧾 INPUTS */
+/* ============================= */
+
+input,
+textarea,
+select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  outline: none;
+  margin-bottom: 15px;
+  background: #334155;
+  color: white;
+  font-size: 14px;
+}
+
+/* ============================= */
+/* 📦 CARD */
+/* ============================= */
+
+.card {
+  background: var(--card-dark);
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+/* ============================= */
+/* ⚠ ERROR */
+/* ============================= */
+
+.error-text {
+  color: var(--danger);
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+/* ============================= */
+/* 📱 MOBILE IMPROVEMENTS */
+/* ============================= */
+
+@media (max-width: 480px) {
+  body {
+    font-size: 14px;
+  }
+
+  button {
+    padding: 8px 12px;
+  }
+}
