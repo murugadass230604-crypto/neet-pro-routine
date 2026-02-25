@@ -12,38 +12,39 @@ const {
   updateProfile
 } = require("../controllers/authController");
 
-const { protect } = require("../middleware/authMiddleware");
+const { protect } = require("../middlewares/authMiddleware");
 
 // ==========================
-// 🌍 PUBLIC ROUTES
+// PUBLIC ROUTES
 // ==========================
 
-// 📧 Send Signup OTP
+// Send OTP
 router.post("/send-otp", sendOtp);
 
-// ✅ Verify OTP
+// Verify OTP
 router.post("/verify-otp", verifyOtp);
 
-// 📝 Signup (Final Registration)
+// Complete Signup (after OTP)
 router.post("/signup", signup);
 
-// 🔐 Login
+// Login
 router.post("/login", login);
 
-// 🔁 Forgot Password OTP
-router.post("/forgot-password", sendResetOtp);
+// Send Reset OTP
+router.post("/send-reset-otp", sendResetOtp);
 
-// 🔄 Reset Password
+// Reset Password
 router.post("/reset-password", resetPassword);
 
+
 // ==========================
-// 🔒 PROTECTED ROUTES
+// PROTECTED ROUTES
 // ==========================
 
-// 👤 Get Logged-in User
+// Get logged-in user
 router.get("/me", protect, getMe);
 
-// ✏ Update Profile
+// Update profile
 router.put("/update-profile", protect, updateProfile);
 
 module.exports = router;

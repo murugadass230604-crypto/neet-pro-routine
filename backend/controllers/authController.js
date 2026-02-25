@@ -18,14 +18,16 @@ const generateToken = (user) => {
 // 📧 MAIL TRANSPORTER
 // ==========================
 const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: Number(process.env.EMAIL_PORT),
-  secure: false, // 587 uses false
+  host: "smtp-relay.brevo.com",
+  port: 587,
+  secure: false,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
+    user: process.env.BREVO_USER,
+    pass: process.env.BREVO_PASS,
+  },
 });
+console.log("BREVO_USER:", process.env.BREVO_USER);
+console.log("BREVO_PASS exists:", !!process.env.BREVO_PASS);
 
 transporter.verify((error, success) => {
   if (error) {
@@ -67,13 +69,12 @@ const sendOtp = async (req, res) => {
 
     await user.save();
 
-    await transporter.sendMail({
-      from: `"NEET Pro" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: "NEET Pro Signup OTP",
-      html: `<h2>Your OTP: ${otp}</h2><p>Valid for 5 minutes</p>`
-    });
-
+await transporter.sendMail({
+  from: `"NEET Pro" <dassgame2327@gmail.com>`,
+  to: email,
+  subject: "NEET Pro Signup OTP",
+  html: `<h2>Your OTP: ${otp}</h2><p>Valid for 5 minutes</p>`
+});
     res.json({
       success: true,
       message: "OTP sent successfully"
