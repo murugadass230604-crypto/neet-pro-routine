@@ -83,20 +83,21 @@ const sendOtp = async (req, res) => {
     user.otpExpiry = Date.now() + 5 * 60 * 1000;
     await user.save();
 
-    try {
-      await transporter.sendMail({
-        from: `"NEET Pro" <${process.env.BREVO_USER}>`,
-        to: email,
-        subject: "NEET Pro Signup OTP",
-        html: `<h2>Your OTP: ${otp}</h2><p>Valid for 5 minutes</p>`
-      });
-    } catch (mailError) {
-      console.error("SMTP Error:", mailError);
-      return res.status(500).json({
-        success: false,
-        message: "Email service error"
-      });
-    }
+try {
+  await transporter.sendMail({
+    from: `"NEET Pro" <murugadass230604@gmail.com>`,
+    to: email,
+    subject: "NEET Pro Signup OTP",
+    html: `<h2>Your OTP: ${otp}</h2><p>Valid for 5 minutes</p>`
+  });
+}
+catch (mailError) {
+  console.error("🔥 FULL SMTP ERROR:", mailError);
+  return res.status(500).json({
+    success: false,
+    message: mailError.message
+  });
+}
 
     res.json({
       success: true,
