@@ -9,17 +9,17 @@ export default function Admin() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
 
-useEffect(() => {
-  const role = localStorage.getItem("role");
+  useEffect(() => {
+    const role = localStorage.getItem("role");
 
-  if (role !== "admin") {
-    navigate("/", { replace: true });
-    return;
-  }
+    if (role !== "admin") {
+      navigate("/", { replace: true });
+      return;
+    }
 
-  speakWelcome();
-  loadData();
-}, [navigate]);
+    speakWelcome();
+    loadData();
+  }, [navigate]);
 
   const speakWelcome = () => {
     const msg = new SpeechSynthesisUtterance(
@@ -31,19 +31,19 @@ useEffect(() => {
     window.speechSynthesis.speak(msg);
   };
 
-const loadData = async () => {
-  try {
-    const dash = await API.get("/admin/dashboard");
-    const userRes = await API.get("/admin/users");
+  const loadData = async () => {
+    try {
+      const dash = await API.get("/admin/dashboard");
+      const userRes = await API.get("/admin/users");
 
-    setStats(dash.data?.stats || {});
-    setUsers(userRes.data?.users || []);
-  } catch (err) {
-    console.error("Admin Load Error:", err);
-  } finally {
-    setLoading(false);
-  }
-};
+      setStats(dash.data?.stats || {});
+      setUsers(userRes.data?.users || []);
+    } catch (err) {
+      console.error("Admin Load Error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const deleteUser = async (id) => {
     if (!window.confirm("Delete this user permanently?")) return;
@@ -58,30 +58,31 @@ const loadData = async () => {
   };
 
   if (loading) {
-    return <div style={styles.loading}>Loading Admin Panel...</div>;
+    return <div className="admin-loading">Loading Admin Panel...</div>;
   }
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
+    <div className="admin-container">
+      {/* Header */}
+      <div className="admin-header">
         <h1>👑 NEET PRO ADMIN</h1>
-        <button style={styles.logoutBtn} onClick={logout}>
+        <button className="admin-logout" onClick={logout}>
           Logout
         </button>
       </div>
 
       {/* Stats */}
-      <div style={styles.statsContainer}>
+      <div className="admin-stats">
         <StatCard title="Total Users" value={stats.totalUsers} />
         <StatCard title="Active Users" value={stats.activeUsers} />
         <StatCard title="Study Logs" value={stats.totalStudyLogs} />
       </div>
 
       {/* Users Table */}
-      <h2 style={{ marginTop: "40px" }}>User Activity Monitor</h2>
+      <h2 className="admin-subtitle">User Activity Monitor</h2>
 
-      <div style={styles.tableWrapper}>
-        <table style={styles.table}>
+      <div className="admin-table-wrapper">
+        <table className="admin-table">
           <thead>
             <tr>
               <th>Name</th>
@@ -102,15 +103,15 @@ const loadData = async () => {
                 <td>{user.role}</td>
                 <td>
                   {user.isActive ? (
-                    <span style={{ color: "#22c55e" }}>Active</span>
+                    <span className="status-active">Active</span>
                   ) : (
-                    <span style={{ color: "#ef4444" }}>Blocked</span>
+                    <span className="status-blocked">Blocked</span>
                   )}
                 </td>
                 <td>
                   {user.role !== "admin" && (
                     <button
-                      style={styles.deleteBtn}
+                      className="admin-delete"
                       onClick={() => deleteUser(user._id)}
                     >
                       Delete
@@ -128,68 +129,9 @@ const loadData = async () => {
 
 function StatCard({ title, value }) {
   return (
-    <div style={styles.card}>
+    <div className="admin-card">
       <h3>{title}</h3>
       <p>{value || 0}</p>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    minHeight: "100vh",
-    background: "linear-gradient(135deg,#0f172a,#020617)",
-    color: "white",
-    padding: "30px"
-  },
-  header: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center"
-  },
-  logoutBtn: {
-    background: "#ef4444",
-    border: "none",
-    padding: "8px 15px",
-    borderRadius: "6px",
-    color: "white",
-    cursor: "pointer"
-  },
-  statsContainer: {
-    display: "flex",
-    gap: "20px",
-    flexWrap: "wrap",
-    marginTop: "30px"
-  },
-  card: {
-    background: "#1e293b",
-    padding: "25px",
-    borderRadius: "15px",
-    width: "220px",
-    textAlign: "center"
-  },
-  tableWrapper: {
-    overflowX: "auto"
-  },
-  table: {
-    width: "100%",
-    borderCollapse: "collapse",
-    background: "#1e293b"
-  },
-  deleteBtn: {
-    background: "#ef4444",
-    border: "none",
-    padding: "6px 10px",
-    borderRadius: "5px",
-    color: "white",
-    cursor: "pointer"
-  },
-  loading: {
-    height: "100vh",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    background: "#0f172a",
-    color: "white"
-  }
-};

@@ -17,14 +17,23 @@ const generateToken = (user) => {
 // ==========================
 // 📧 MAIL TRANSPORTER
 // ==========================
+// ==========================
+// 📧 MAIL TRANSPORTER (FIXED FOR RENDER)
+// ==========================
 const transporter = nodemailer.createTransport({
-  host: "smtp-relay.brevo.com",   // VERY IMPORTANT
+  host: process.env.BREVO_HOST || "smtp-relay.brevo.com",
   port: 587,
-  secure: false,                  // TLS
+  secure: false,
   auth: {
     user: process.env.BREVO_USER,
-    pass: process.env.BREVO_PASS,
+    pass: process.env.BREVO_PASS
   },
+  tls: {
+    rejectUnauthorized: false
+  },
+  connectionTimeout: 10000, // 10 sec
+  greetingTimeout: 10000,
+  socketTimeout: 10000
 });
 
 console.log("BREVO_USER:", process.env.BREVO_USER);
@@ -72,15 +81,23 @@ const sendOtp = async (req, res) => {
 
     user.otp = otp;
     user.otpExpiry = Date.now() + 5 * 60 * 1000;
-
     await user.save();
 
-await transporter.sendMail({
-  from: `"NEET Pro" <a35375001@smtp-brevo.com>`,
-  to: email,
-  subject: "NEET Pro Signup OTP",
-  html: `<h2>Your OTP: ${otp}</h2><p>Valid for 5 minutes</p>`
-});
+    try {
+      await transporter.sendMail({
+        from: `"NEET Pro" <${process.env.BREVO_USER}>`,
+        to: email,
+        subject: "NEET Pro Signup OTP",
+        html: `<h2>Your OTP: ${otp}</h2><p>Valid for 5 minutes</p>`
+      });
+    } catch (mailError) {
+      console.error("SMTP Error:", mailError);
+      return res.status(500).json({
+        success: false,
+        message: "Email service error"
+      });
+    }
+
     res.json({
       success: true,
       message: "OTP sent successfully"

@@ -9,7 +9,7 @@ import {
 } from "react-icons/fa";
 import { useState } from "react";
 
-export default function Sidebar() {
+export default function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const [collapsed, setCollapsed] = useState(false);
 
   const menuItems = [
@@ -19,86 +19,129 @@ export default function Sidebar() {
     { name: "Settings", path: "/settings", icon: <FaCog /> }
   ];
 
+  const isMobile = window.innerWidth < 768;
+
   return (
-    <div
-      style={{
-        width: collapsed ? "80px" : "240px",
-        height: "100vh",
-        background: "#111827",
-        color: "white",
-        transition: "0.3s ease",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-between",
-        padding: "20px 10px"
-      }}
-    >
-      {/* Top Section */}
-      <div>
+    <>
+      {/* Overlay for Mobile */}
+      {isMobile && sidebarOpen && (
         <div
-          style={{
-            display: "flex",
-            justifyContent: collapsed ? "center" : "space-between",
-            alignItems: "center",
-            marginBottom: "30px"
-          }}
-        >
-          {!collapsed && <h2 style={{ margin: 0 }}>NeetPro</h2>}
+          onClick={() => setSidebarOpen(false)}
+          style={styles.overlay}
+        />
+      )}
 
-          <button
-            onClick={() => setCollapsed(!collapsed)}
-            style={{
-              background: "none",
-              border: "none",
-              color: "white",
-              cursor: "pointer"
-            }}
-          >
-            {collapsed ? <FaChevronRight /> : <FaChevronLeft />}
-          </button>
-        </div>
-
-        {/* Menu */}
-        {menuItems.map((item, index) => (
-          <NavLink
-            key={index}
-            to={item.path}
-            style={({ isActive }) => ({
-              display: "flex",
-              alignItems: "center",
-              gap: "15px",
-              padding: "12px 15px",
-              borderRadius: "10px",
-              marginBottom: "10px",
-              textDecoration: "none",
-              color: "white",
-              background: isActive ? "#6366f1" : "transparent",
-              transition: "0.2s"
-            })}
-          >
-            <span style={{ fontSize: "18px" }}>{item.icon}</span>
-            {!collapsed && <span>{item.name}</span>}
-          </NavLink>
-        ))}
-      </div>
-
-      {/* Bottom Section (XP Badge) */}
       <div
         style={{
-          background: "#1f2937",
-          padding: "12px",
-          borderRadius: "10px",
-          textAlign: "center",
-          fontSize: "14px"
+          ...styles.sidebar,
+          width: collapsed ? "80px" : "240px",
+          left: isMobile
+            ? sidebarOpen
+              ? "0"
+              : "-260px"
+            : "0"
         }}
       >
-        {!collapsed && (
-          <>
-            <p style={{ margin: "0 0 5px 0" }}>🔥 Level</p>
-            <strong>Disciplined</strong>
-          </>
-        )}
+        {/* Top Section */}
+        <div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: collapsed ? "center" : "space-between",
+              alignItems: "center",
+              marginBottom: "30px"
+            }}
+          >
+            {!collapsed && <h2 style={{ margin: 0 }}>NeetPro</h2>}
+
+            <button
+              onClick={() => setCollapsed(!collapsed)}
+              style={styles.toggleBtn}
+            >
+              {collapsed ? <FaChevronRight /> : <FaChevronLeft />}
+            </button>
+          </div>
+
+          {/* Menu Items */}
+          {menuItems.map((item, index) => (
+            <NavLink
+              key={index}
+              to={item.path}
+              onClick={() => isMobile && setSidebarOpen(false)}
+              style={({ isActive }) => ({
+                ...styles.link,
+                background: isActive ? "#6366f1" : "transparent"
+              })}
+            >
+              <span style={{ fontSize: "18px" }}>{item.icon}</span>
+              {!collapsed && <span>{item.name}</span>}
+            </NavLink>
+          ))}
+        </div>
+
+        {/* Bottom Section */}
+        <div style={styles.bottomCard}>
+          {!collapsed && (
+            <>
+              <p style={{ margin: "0 0 5px 0" }}>🔥 Level</p>
+              <strong>Disciplined</strong>
+            </>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
+
+const styles = {
+  sidebar: {
+    height: "100vh",
+    background: "#111827",
+    color: "white",
+    transition: "0.3s ease",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "space-between",
+    padding: "20px 10px",
+    position: "fixed",
+    top: 0,
+    zIndex: 1001
+  },
+
+  link: {
+    display: "flex",
+    alignItems: "center",
+    gap: "15px",
+    padding: "12px 15px",
+    borderRadius: "10px",
+    marginBottom: "10px",
+    textDecoration: "none",
+    color: "white",
+    transition: "0.2s"
+  },
+
+  toggleBtn: {
+    background: "none",
+    border: "none",
+    color: "white",
+    cursor: "pointer"
+  },
+
+  bottomCard: {
+    background: "#1f2937",
+    padding: "12px",
+    borderRadius: "10px",
+    textAlign: "center",
+    fontSize: "14px"
+  },
+
+  overlay: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    background: "rgba(0,0,0,0.5)",
+    zIndex: 1000
+  }
+};

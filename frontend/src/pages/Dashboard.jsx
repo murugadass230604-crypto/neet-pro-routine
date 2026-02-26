@@ -12,18 +12,15 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const user = JSON.parse(localStorage.getItem("user"));
-
-        // Fetch dashboard summary
+        // Fetch summary
         const summaryRes = await API.get("/analytics/summary");
         setSummary(summaryRes.data.summary);
 
-        // Fetch today's schedule
+        // Fetch today schedule
         const scheduleRes = await API.get("/schedule/today");
         if (scheduleRes.data.schedule) {
           setTasks(scheduleRes.data.schedule.tasks);
         }
-
       } catch (error) {
         console.log("Dashboard fetch error:", error);
       } finally {
@@ -38,9 +35,8 @@ export default function Dashboard() {
     return <div style={{ padding: "20px" }}>Loading Dashboard...</div>;
   }
 
-  const studyTasks = tasks.filter(t => t.category === "Study");
+  const studyTasks = tasks.filter((t) => t.category === "Study");
 
-  // XP Progress Calculation
   const xp = summary?.xp || 0;
   const xpProgress = xp % 100;
 
@@ -72,17 +68,17 @@ export default function Dashboard() {
   ];
 
   return (
-    <div style={{ padding: "25px" }}>
+    <div className="dashboard-container">
       {/* Header */}
       <motion.h2
-        initial={{ opacity: 0, y: -20 }}
+        initial={{ opacity: 0, y: -15 }}
         animate={{ opacity: 1, y: 0 }}
-        style={{ marginBottom: "5px" }}
+        className="dashboard-title"
       >
         Welcome back 👋
       </motion.h2>
 
-      <p style={{ color: "#94a3b8", marginBottom: "30px" }}>
+      <p className="dashboard-sub">
         Level: {summary?.level} | XP: {xp}
       </p>
 
@@ -90,63 +86,40 @@ export default function Dashboard() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        style={{
-          background: "#1e293b",
-          padding: "30px",
-          borderRadius: "16px",
-          marginBottom: "40px",
-          display: "flex",
-          justifyContent: "center",
-        }}
+        className="xp-card"
       >
         <XPCircle percentage={xpProgress} />
       </motion.div>
 
-      {/* Stats Grid */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-          gap: "20px",
-        }}
-      >
+      {/* Stats */}
+      <div className="stats-grid">
         {stats.map((stat, index) => (
           <motion.div
             key={index}
-            whileHover={{ scale: 1.05 }}
-            initial={{ opacity: 0, y: 30 }}
+            whileHover={{ scale: 1.03 }}
+            initial={{ opacity: 0, y: 25 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.15 }}
-            style={{
-              background: "#1e293b",
-              padding: "20px",
-              borderRadius: "14px",
-              boxShadow: "0 8px 20px rgba(0,0,0,0.3)",
-            }}
+            transition={{ delay: index * 0.1 }}
+            className="stat-card"
           >
             <div
-              style={{
-                fontSize: "22px",
-                marginBottom: "10px",
-                color: stat.color,
-              }}
+              className="stat-icon"
+              style={{ color: stat.color }}
             >
               {stat.icon}
             </div>
             <h4>{stat.title}</h4>
-            <p style={{ fontSize: "20px", fontWeight: "bold" }}>
-              {stat.value}
-            </p>
+            <p className="stat-value">{stat.value}</p>
           </motion.div>
         ))}
       </div>
 
-      {/* Task List */}
-      <div style={{ marginTop: "50px" }}>
+      {/* Tasks */}
+      <div className="task-section">
         <h3>Today's Schedule</h3>
 
         {tasks.length === 0 && (
-          <p style={{ color: "#94a3b8" }}>No tasks scheduled for today.</p>
+          <p className="no-task">No tasks scheduled for today.</p>
         )}
 
         {tasks.map((task, index) => (
@@ -155,19 +128,12 @@ export default function Dashboard() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: index * 0.05 }}
-            style={{
-              background: "#0f172a",
-              padding: "12px",
-              marginTop: "10px",
-              borderRadius: "10px",
-              display: "flex",
-              justifyContent: "space-between",
-            }}
+            className="task-card"
           >
             <span>
               {task.icon} {task.title}
             </span>
-            <span>
+            <span className="task-time">
               {task.startTime} - {task.endTime}
             </span>
           </motion.div>

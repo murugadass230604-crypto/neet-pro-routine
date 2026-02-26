@@ -30,7 +30,7 @@ export default function AddStudy() {
     try {
       setLoading(true);
 
-      const res = await API.post("/study", {
+      await API.post("/study", {
         subject: formData.subject,
         hours: Number(formData.hours),
         examType: formData.examType,
@@ -57,19 +57,19 @@ export default function AddStudy() {
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
-      style={styles.container}
+      className="addstudy-container"
     >
-      <h2 style={styles.title}>📚 Add Study Session</h2>
+      <h2 className="addstudy-title">📚 Add Study Session</h2>
 
-      <form onSubmit={handleSubmit} style={styles.card}>
+      <form onSubmit={handleSubmit} className="addstudy-card">
 
         <input
           type="text"
           name="subject"
-          placeholder="Enter Subject (e.g., Quantitative Aptitude)"
+          placeholder="Enter Subject"
           value={formData.subject}
           onChange={handleChange}
-          style={styles.input}
+          className="addstudy-input"
         />
 
         <input
@@ -78,16 +78,16 @@ export default function AddStudy() {
           placeholder="Study Hours"
           value={formData.hours}
           onChange={handleChange}
-          style={styles.input}
           min="0.5"
           step="0.5"
+          className="addstudy-input"
         />
 
         <select
           name="examType"
           value={formData.examType}
           onChange={handleChange}
-          style={styles.input}
+          className="addstudy-input"
         >
           <option value="Banking">Banking</option>
           <option value="TNPSC">TNPSC</option>
@@ -99,47 +99,13 @@ export default function AddStudy() {
           name="date"
           value={formData.date}
           onChange={handleChange}
-          style={styles.input}
+          className="addstudy-input"
         />
 
-        <button type="submit" style={styles.button} disabled={loading}>
+        <button type="submit" disabled={loading} className="addstudy-button">
           {loading ? "Saving..." : "Add Study"}
         </button>
       </form>
     </motion.div>
   );
 }
-
-const styles = {
-  container: {
-    maxWidth: "600px",
-    margin: "auto",
-    padding: "20px"
-  },
-  title: {
-    marginBottom: "20px"
-  },
-  card: {
-    background: "#1e293b",
-    padding: "25px",
-    borderRadius: "20px",
-    display: "flex",
-    flexDirection: "column",
-    gap: "15px"
-  },
-  input: {
-    padding: "12px",
-    borderRadius: "10px",
-    border: "none",
-    fontSize: "14px"
-  },
-  button: {
-    padding: "12px",
-    background: "#6366f1",
-    border: "none",
-    borderRadius: "10px",
-    color: "white",
-    fontWeight: "bold",
-    cursor: "pointer"
-  }
-};

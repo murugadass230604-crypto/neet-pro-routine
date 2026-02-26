@@ -25,15 +25,21 @@ ChartJS.register(
 
 export default function ProductivityChart() {
   const [weeklyData, setWeeklyData] = useState([0, 0, 0, 0, 0, 0, 0]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchWeeklyStats = async () => {
       try {
         const res = await API.get("/study/weekly");
-        const hours = res.data.map((day) => day.hours);
-        setWeeklyData(hours);
+
+        if (Array.isArray(res.data)) {
+          const hours = res.data.map((day) => day.hours || 0);
+          setWeeklyData(hours);
+        }
       } catch (err) {
         console.log("Weekly stats error:", err);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -50,8 +56,18 @@ export default function ProductivityChart() {
         tension: 0.4,
         borderColor: "#6366f1",
         backgroundColor: (context) => {
-          const ctx = context.chart.ctx;
-          const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+          const chart = context.chart;
+          const { ctx, chartArea } = chart;
+
+          if (!chartArea) return null; // Prevent crash before initial render
+
+          const gradient = ctx.createLinearGradient(
+            0,
+            chartArea.top,
+            0,
+            chartArea.bottom
+          );
+
           gradient.addColorStop(0, "rgba(99,102,241,0.6)");
           gradient.addColorStop(1, "rgba(99,102,241,0.05)");
           return gradient;
@@ -64,6 +80,7 @@ export default function ProductivityChart() {
 
   const options = {
     responsive: true,
+    maintainAspectRatio: false,
     plugins: {
       legend: {
         display: false
@@ -97,7 +114,14 @@ export default function ProductivityChart() {
       style={styles.card}
     >
       <h3 style={styles.title}>📊 Weekly Productivity</h3>
-      <Line data={data} options={options} />
+
+      {loading ? (
+        <p style={{ color: "#94a3b8" }}>Loading chart...</p>
+      ) : (
+        <div style={styles.chartWrapper}>
+          <Line data={data} options={options} />
+        </div>
+      )}
     </motion.div>
   );
 }
@@ -108,10 +132,14 @@ const styles = {
     padding: "25px",
     borderRadius: "20px",
     boxShadow: "0 20px 50px rgba(0,0,0,0.4)",
-    marginTop: "30px"
+    marginTop: "30px",
+    width: "100%"
   },
   title: {
     marginBottom: "20px",
     color: "white"
+  },
+  chartWrapper: {
+    height: "300px"
   }
 };

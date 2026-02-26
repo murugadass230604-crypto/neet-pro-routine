@@ -1,26 +1,19 @@
 import axios from "axios";
 
-/*
-  🔥 IMPORTANT:
-  - Development → Laptop IPv4
-  - Production (Android Build) → Also Laptop IPv4 (for now)
-  - Later deploy pannina production URL change pannalaam
-*/
-
-const BASE_URL =
-  import.meta.env.MODE === "development"
-    ? "https://semisecretly-semilyric-junita.ngrok-free.dev/api"   // ✅ Your Laptop IPv4
-    : "https://semisecretly-semilyric-junita.ngrok-free.dev/api";  // ✅ Same for Android build testing
+// 🔥 Render Production Backend
+const BASE_URL = "https://neet-pro-backend.onrender.com/api";
 
 const API = axios.create({
   baseURL: BASE_URL,
+  timeout: 60000, // 30 sec safe for Render cold start
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 10000, // optional safety timeout
 });
 
+// ==========================
 // 🔐 Attach JWT Automatically
+// ==========================
 API.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -34,16 +27,20 @@ API.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
+// ==========================
 // 🌍 Global Error Handling
+// ==========================
 API.interceptors.response.use(
   (response) => response,
   (error) => {
+    // If Render is sleeping (cold start)
     if (!error.response) {
-      console.error("Network Error - Backend not reachable");
-      alert("Cannot connect to server. Check WiFi & Backend.");
+      console.warn("Server might be waking up...");
+      alert("Server is starting. Please wait 30 seconds and try again.");
       return Promise.reject(error);
     }
 
+    // If token expired
     if (error.response.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("role");

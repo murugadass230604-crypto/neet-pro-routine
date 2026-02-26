@@ -36,22 +36,17 @@ export default function Login() {
     try {
       const res = await API.post("/auth/login", formData);
 
-      // 🔥 Backend should return:
-      // { token, user }
-
       const { token, user } = res.data;
 
       if (!token || !user) {
         throw new Error("Invalid login response");
       }
 
-      // ✅ Save token & role
+      // Save token & role
       localStorage.setItem("token", token);
       localStorage.setItem("role", user.role);
 
-      setLoading(false);
-
-      // ✅ Redirect based on role
+      // Redirect based on role
       if (user.role === "admin") {
         navigate("/admin");
       } else {
@@ -59,20 +54,20 @@ export default function Login() {
       }
 
     } catch (err) {
-      setLoading(false);
-
       setError(
         err.response?.data?.message ||
         err.message ||
         "Login failed"
       );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h2>🚀 NEET Pro Login</h2>
+        <h2 style={{ marginBottom: "20px" }}>🚀 NEET Pro Login</h2>
 
         {error && <p style={styles.error}>{error}</p>}
 
@@ -105,7 +100,14 @@ export default function Login() {
             </span>
           </div>
 
-          <button type="submit" disabled={loading} style={styles.button}>
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              ...styles.button,
+              opacity: loading ? 0.7 : 1
+            }}
+          >
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
@@ -116,7 +118,7 @@ export default function Login() {
           </span>
         </div>
 
-        <p style={{ marginTop: "10px" }}>
+        <p style={{ marginTop: "12px" }}>
           <Link to="/forgot-password" style={styles.link}>
             Forgot Password?
           </Link>
@@ -159,7 +161,9 @@ const styles = {
     padding: "12px",
     marginBottom: "12px",
     borderRadius: "8px",
-    border: "none"
+    border: "none",
+    background: "#334155",
+    color: "white"
   },
   button: {
     width: "100%",
@@ -182,7 +186,7 @@ const styles = {
   },
   toggle: {
     position: "absolute",
-    right: "10px",
+    right: "12px",
     top: "12px",
     cursor: "pointer",
     fontSize: "12px",

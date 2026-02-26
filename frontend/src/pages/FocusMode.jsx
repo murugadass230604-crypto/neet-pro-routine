@@ -3,18 +3,17 @@ import { motion } from "framer-motion";
 import API from "../utils/api";
 
 export default function FocusMode() {
-  const [mode, setMode] = useState("focus"); // focus | short | long
-  const [timeLeft, setTimeLeft] = useState(1500); // 25 mins default
+  const [mode, setMode] = useState("focus");
+  const [timeLeft, setTimeLeft] = useState(1500);
   const [isRunning, setIsRunning] = useState(false);
   const [sessions, setSessions] = useState(0);
 
   const durations = {
-    focus: 1500,      // 25 min
-    short: 300,       // 5 min
-    long: 900         // 15 min
+    focus: 1500,
+    short: 300,
+    long: 900
   };
 
-  // Timer Logic
   useEffect(() => {
     let timer;
 
@@ -59,50 +58,47 @@ export default function FocusMode() {
   const progress = (timeLeft / durations[mode]) * 100;
 
   return (
-    <div style={styles.container}>
+    <div className="focus-container">
       <motion.h2
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        style={styles.title}
+        className="focus-title"
       >
         🎯 Focus Mode
       </motion.h2>
 
       {/* Mode Switch */}
-      <div style={styles.modeSwitch}>
+      <div className="focus-mode-switch">
         {["focus", "short", "long"].map((m) => (
           <button
             key={m}
             onClick={() => changeMode(m)}
-            style={{
-              ...styles.modeBtn,
-              background: mode === m ? "#6366f1" : "#1e293b"
-            }}
+            className={`focus-mode-btn ${mode === m ? "active" : ""}`}
           >
             {m.toUpperCase()}
           </button>
         ))}
       </div>
 
-      {/* Circular Timer */}
-      <div style={styles.circleContainer}>
+      {/* Timer Circle */}
+      <div className="focus-circle-container">
         <motion.div
+          className="focus-circle"
           style={{
-            ...styles.circle,
             background: `conic-gradient(#6366f1 ${progress}%, #1f2937 0%)`
           }}
         >
-          <div style={styles.innerCircle}>
+          <div className="focus-inner-circle">
             <h1>{formatTime(timeLeft)}</h1>
           </div>
         </motion.div>
       </div>
 
       {/* Controls */}
-      <div style={styles.controls}>
+      <div className="focus-controls">
         <button
           onClick={() => setIsRunning(!isRunning)}
-          style={styles.controlBtn}
+          className="focus-control-btn"
         >
           {isRunning ? "Pause" : "Start"}
         </button>
@@ -112,94 +108,21 @@ export default function FocusMode() {
             setTimeLeft(durations[mode]);
             setIsRunning(false);
           }}
-          style={styles.controlBtn}
+          className="focus-control-btn"
         >
           Reset
         </button>
       </div>
 
-      {/* Sessions Counter */}
-      <div style={styles.sessionCard}>
+      {/* Sessions */}
+      <div className="focus-session-card">
         <h3>🔥 Completed Sessions</h3>
         <h2>{sessions}</h2>
       </div>
 
-      {/* Krishna Quote */}
-      <p style={styles.krishnaText}>
+      <p className="focus-quote">
         🧘 Krishna says: Silence distractions. Focus deeply.
       </p>
     </div>
   );
 }
-
-const styles = {
-  container: {
-    textAlign: "center",
-    padding: "40px",
-    minHeight: "100vh"
-  },
-  title: {
-    marginBottom: "30px"
-  },
-  modeSwitch: {
-    display: "flex",
-    justifyContent: "center",
-    gap: "15px",
-    marginBottom: "30px"
-  },
-  modeBtn: {
-    padding: "10px 15px",
-    borderRadius: "10px",
-    border: "none",
-    color: "white",
-    cursor: "pointer"
-  },
-  circleContainer: {
-    display: "flex",
-    justifyContent: "center",
-    marginBottom: "30px"
-  },
-  circle: {
-    width: "220px",
-    height: "220px",
-    borderRadius: "50%",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    transition: "0.3s"
-  },
-  innerCircle: {
-    width: "180px",
-    height: "180px",
-    borderRadius: "50%",
-    background: "#0f172a",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  controls: {
-    display: "flex",
-    justifyContent: "center",
-    gap: "20px",
-    marginBottom: "30px"
-  },
-  controlBtn: {
-    padding: "10px 20px",
-    borderRadius: "10px",
-    background: "#6366f1",
-    border: "none",
-    color: "white",
-    cursor: "pointer"
-  },
-  sessionCard: {
-    background: "#1e293b",
-    padding: "20px",
-    borderRadius: "15px",
-    display: "inline-block"
-  },
-  krishnaText: {
-    marginTop: "30px",
-    fontStyle: "italic",
-    color: "#94a3b8"
-  }
-};

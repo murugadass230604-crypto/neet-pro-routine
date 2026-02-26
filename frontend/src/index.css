@@ -192,3 +192,419 @@ select {
     padding: 8px 12px;
   }
 }
+
+/* ===================================================== */
+/* 🚀 DASHBOARD STYLES (ADDED - DO NOT REMOVE ABOVE) */
+/* ===================================================== */
+
+.dashboard-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.dashboard-title {
+  margin-bottom: 5px;
+}
+
+.dashboard-sub {
+  color: #94a3b8;
+  margin-bottom: 25px;
+}
+
+/* XP Card */
+.xp-card {
+  background: var(--card-dark);
+  padding: 25px;
+  border-radius: 16px;
+  margin-bottom: 35px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+/* Stat Card */
+.stat-card {
+  background: var(--card-dark);
+  padding: 18px;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  transition: 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-3px);
+}
+
+.stat-icon {
+  font-size: 22px;
+  margin-bottom: 8px;
+}
+
+.stat-value {
+  font-size: 20px;
+  font-weight: bold;
+}
+
+/* Task Section */
+.task-section {
+  margin-top: 45px;
+}
+
+.task-card {
+  background: #0f172a;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 10px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.task-time {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+.no-task {
+  color: #94a3b8;
+}
+
+/* Tablet */
+@media (min-width: 640px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Laptop */
+@media (min-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+/* ================= ADMIN PANEL ================= */
+
+.admin-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a, #020617);
+  color: white;
+  padding: 25px;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.admin-logout {
+  background: #ef4444;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+}
+
+.admin-stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+  margin-top: 30px;
+}
+
+.admin-card {
+  background: #1e293b;
+  padding: 25px;
+  border-radius: 15px;
+  text-align: center;
+}
+
+.admin-subtitle {
+  margin-top: 40px;
+}
+
+.admin-table-wrapper {
+  overflow-x: auto;
+  margin-top: 15px;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #1e293b;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #334155;
+}
+
+.admin-delete {
+  background: #ef4444;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 5px;
+  color: white;
+  cursor: pointer;
+}
+
+.status-active {
+  color: #22c55e;
+}
+
+.status-blocked {
+  color: #ef4444;
+}
+
+.admin-loading {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #0f172a;
+  color: white;
+}
+
+/* Tablet */
+@media (min-width: 640px) {
+  .admin-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Laptop */
+@media (min-width: 1024px) {
+  .admin-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+/* ================= ADD STUDY ================= */
+
+.addstudy-container {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+}
+
+.addstudy-title {
+  margin-bottom: 20px;
+}
+
+.addstudy-card {
+  background: #1e293b;
+  padding: 25px;
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.addstudy-input {
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  font-size: 14px;
+  background: #334155;
+  color: white;
+}
+
+.addstudy-button {
+  padding: 12px;
+  background: #6366f1;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+}
+
+.addstudy-button:hover {
+  opacity: 0.9;
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .addstudy-card {
+    padding: 35px;
+  }
+}
+/* ================= FOCUS MODE ================= */
+
+.focus-container {
+  text-align: center;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.focus-title {
+  margin-bottom: 25px;
+}
+
+/* Mode Switch */
+.focus-mode-switch {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+}
+
+.focus-mode-btn {
+  padding: 10px 15px;
+  border-radius: 10px;
+  border: none;
+  background: #1e293b;
+  color: white;
+  cursor: pointer;
+}
+
+.focus-mode-btn.active {
+  background: #6366f1;
+}
+
+/* Circle */
+.focus-circle-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+}
+
+.focus-circle {
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: 0.3s;
+}
+
+.focus-inner-circle {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  background: #0f172a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Controls */
+.focus-controls {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+
+.focus-control-btn {
+  padding: 10px 20px;
+  border-radius: 10px;
+  background: #6366f1;
+  border: none;
+  color: white;
+  cursor: pointer;
+}
+
+/* Session Card */
+.focus-session-card {
+  background: #1e293b;
+  padding: 20px;
+  border-radius: 15px;
+  display: inline-block;
+}
+
+.focus-quote {
+  margin-top: 25px;
+  font-style: italic;
+  color: #94a3b8;
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .focus-circle {
+    width: 260px;
+    height: 260px;
+  }
+
+  .focus-inner-circle {
+    width: 210px;
+    height: 210px;
+  }
+}
+
+/* Laptop */
+@media (min-width: 1024px) {
+  .focus-container {
+    padding: 40px;
+  }
+}
+/* ================= FORGOT PASSWORD ================= */
+
+.forgot-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+}
+
+.forgot-card {
+  background: #1e293b;
+  padding: 30px;
+  border-radius: 18px;
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  text-align: center;
+}
+
+.forgot-input {
+  padding: 12px;
+  border-radius: 10px;
+  border: none;
+  background: #334155;
+  color: white;
+  font-size: 14px;
+}
+
+.forgot-btn {
+  padding: 12px;
+  background: #6366f1;
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.forgot-btn:hover {
+  opacity: 0.9;
+}
+
+.forgot-message {
+  font-size: 14px;
+  color: #94a3b8;
+}
+
+/* Tablet */
+@media (min-width: 768px) {
+  .forgot-card {
+    padding: 40px;
+  }
+}

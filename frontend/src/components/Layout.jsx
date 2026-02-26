@@ -1,19 +1,28 @@
 import { Outlet } from "react-router-dom";
+import { useState } from "react";
 import Sidebar from "./Sidebar";
 import Navbar from "./Navbar";
 
 export default function Layout() {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
   return (
     <div style={styles.wrapper}>
 
       {/* Sidebar */}
-      <Sidebar />
+      <Sidebar
+        sidebarOpen={sidebarOpen}
+        setSidebarOpen={setSidebarOpen}
+      />
 
       {/* Main Content Area */}
       <div style={styles.mainArea}>
 
         {/* Top Navbar */}
-        <Navbar />
+        <Navbar
+          sidebarOpen={sidebarOpen}
+          setSidebarOpen={setSidebarOpen}
+        />
 
         {/* Routed Page Content */}
         <div style={styles.pageContent}>
@@ -29,7 +38,7 @@ export default function Layout() {
 const styles = {
   wrapper: {
     display: "flex",
-    height: "100vh",
+    minHeight: "100vh",
     background: "#0f172a",
     color: "white"
   },

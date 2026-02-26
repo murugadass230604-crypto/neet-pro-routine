@@ -13,6 +13,7 @@ export default function ForgotPassword() {
   });
 
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -20,6 +21,7 @@ export default function ForgotPassword() {
 
   const sendOtp = async () => {
     try {
+      setLoading(true);
       await API.post("/auth/forgot-password", {
         email: form.email
       });
@@ -27,54 +29,79 @@ export default function ForgotPassword() {
       setMessage("OTP sent to email");
     } catch (err) {
       setMessage(err.response?.data?.message || "Error sending OTP");
+    } finally {
+      setLoading(false);
     }
   };
 
   const resetPassword = async () => {
     try {
+      setLoading(true);
       await API.post("/auth/reset-password", form);
       setMessage("Password updated successfully");
       setTimeout(() => navigate("/login"), 1500);
     } catch (err) {
       setMessage(err.response?.data?.message || "Reset failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div style={{ textAlign: "center", marginTop: "100px" }}>
-      <h2>Forgot Password</h2>
+    <div className="forgot-container">
+      <div className="forgot-card">
+        <h2>Forgot Password</h2>
 
-      {message && <p>{message}</p>}
+        {message && <p className="forgot-message">{message}</p>}
 
-      {step === 1 && (
-        <>
-          <input
-            type="email"
-            name="email"
-            placeholder="Enter Email"
-            onChange={handleChange}
-          />
-          <button onClick={sendOtp}>Send OTP</button>
-        </>
-      )}
+        {step === 1 && (
+          <>
+            <input
+              type="email"
+              name="email"
+              placeholder="Enter Email"
+              value={form.email}
+              onChange={handleChange}
+              className="forgot-input"
+            />
+            <button
+              onClick={sendOtp}
+              disabled={loading}
+              className="forgot-btn"
+            >
+              {loading ? "Sending..." : "Send OTP"}
+            </button>
+          </>
+        )}
 
-      {step === 2 && (
-        <>
-          <input
-            type="text"
-            name="otp"
-            placeholder="Enter OTP"
-            onChange={handleChange}
-          />
-          <input
-            type="password"
-            name="newPassword"
-            placeholder="New Password"
-            onChange={handleChange}
-          />
-          <button onClick={resetPassword}>Reset Password</button>
-        </>
-      )}
+        {step === 2 && (
+          <>
+            <input
+              type="text"
+              name="otp"
+              placeholder="Enter OTP"
+              value={form.otp}
+              onChange={handleChange}
+              className="forgot-input"
+            />
+            <input
+              type="password"
+              name="newPassword"
+              placeholder="New Password"
+              value={form.newPassword}
+              onChange={handleChange}
+              className="forgot-input"
+            />
+            <button
+              onClick={resetPassword}
+              disabled={loading}
+              className="forgot-btn"
+            >
+              {loading ? "Updating..." : "Reset Password"}
+            </button>
+          </>
+        )}
+      </div>
     </div>
   );
 }

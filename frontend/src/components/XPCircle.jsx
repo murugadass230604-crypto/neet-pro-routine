@@ -1,16 +1,21 @@
 import { motion } from "framer-motion";
 
-export default function XPCircle({ percentage = 0 }) {
-  const radius = 70;
-  const stroke = 10;
-  const normalizedRadius = radius - stroke * 0.5;
+export default function XPCircle({ percentage = 0, size = 160 }) {
+  // Clamp percentage between 0 and 100
+  const safePercentage = Math.min(100, Math.max(0, percentage));
+
+  const radius = size / 2;
+  const stroke = 12;
+  const normalizedRadius = radius - stroke / 2;
   const circumference = normalizedRadius * 2 * Math.PI;
+
   const strokeDashoffset =
-    circumference - (percentage / 100) * circumference;
+    circumference - (safePercentage / 100) * circumference;
 
   return (
-    <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-      <svg height={radius * 2} width={radius * 2}>
+    <div style={styles.wrapper}>
+      <svg height={size} width={size}>
+
         {/* Background Circle */}
         <circle
           stroke="#1f2937"
@@ -23,7 +28,7 @@ export default function XPCircle({ percentage = 0 }) {
 
         {/* Animated Progress Circle */}
         <motion.circle
-          stroke="url(#gradient)"
+          stroke="url(#xpGradient)"
           fill="transparent"
           strokeWidth={stroke}
           strokeLinecap="round"
@@ -31,21 +36,24 @@ export default function XPCircle({ percentage = 0 }) {
           cx={radius}
           cy={radius}
           strokeDasharray={circumference}
-          strokeDashoffset={strokeDashoffset}
-          initial={{ strokeDashoffset: circumference }}
+          strokeDashoffset={circumference}
           animate={{ strokeDashoffset }}
           transition={{ duration: 1 }}
+          style={{
+            transform: "rotate(-90deg)",
+            transformOrigin: "50% 50%"
+          }}
         />
 
-        {/* Gradient */}
+        {/* Gradient Definition */}
         <defs>
-          <linearGradient id="gradient">
+          <linearGradient id="xpGradient" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#6366f1" />
             <stop offset="100%" stopColor="#8b5cf6" />
           </linearGradient>
         </defs>
 
-        {/* Text */}
+        {/* Percentage Text */}
         <text
           x="50%"
           y="50%"
@@ -55,9 +63,17 @@ export default function XPCircle({ percentage = 0 }) {
           fontSize="22"
           fontWeight="bold"
         >
-          {percentage}%
+          {safePercentage}%
         </text>
       </svg>
     </div>
   );
 }
+
+const styles = {
+  wrapper: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center"
+  }
+};

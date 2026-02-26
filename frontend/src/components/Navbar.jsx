@@ -2,14 +2,16 @@ import { useEffect, useState } from "react";
 import { FaBell, FaMoon, FaSun, FaSignOutAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
-export default function Navbar() {
+export default function Navbar({ sidebarOpen, setSidebarOpen }) {
   const navigate = useNavigate();
-  const user = JSON.parse(localStorage.getItem("user"));
+
+  const storedUser = localStorage.getItem("user");
+  const user = storedUser ? JSON.parse(storedUser) : null;
 
   const [time, setTime] = useState("");
   const [darkMode, setDarkMode] = useState(true);
 
-  // Live Clock
+  // ================= Live Clock =================
   useEffect(() => {
     const interval = setInterval(() => {
       const now = new Date();
@@ -19,22 +21,31 @@ export default function Navbar() {
     return () => clearInterval(interval);
   }, []);
 
-  // Theme Toggle
+  // ================= Theme Toggle =================
   const toggleTheme = () => {
-    setDarkMode(!darkMode);
-    document.body.style.background = darkMode ? "#f1f5f9" : "#0f172a";
-    document.body.style.color = darkMode ? "#111" : "white";
+    const newMode = !darkMode;
+    setDarkMode(newMode);
+
+    if (newMode) {
+      document.body.style.background = "#0f172a";
+      document.body.style.color = "white";
+    } else {
+      document.body.style.background = "#f1f5f9";
+      document.body.style.color = "#111";
+    }
   };
 
+  // ================= Logout =================
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    localStorage.removeItem("role");
     navigate("/login");
   };
 
   return (
     <div style={styles.container}>
-      
+
       {/* Left Section */}
       <div style={styles.left}>
         <h3 style={{ margin: 0 }}>🚀 NEET Pro</h3>
@@ -44,7 +55,7 @@ export default function Navbar() {
       {/* Right Section */}
       <div style={styles.right}>
 
-        {/* XP + Level */}
+        {/* Level Badge */}
         <div style={styles.badge}>
           🔥 {user?.level || "Beginner"}
         </div>
@@ -57,7 +68,7 @@ export default function Navbar() {
           {darkMode ? <FaSun /> : <FaMoon />}
         </button>
 
-        {/* User Avatar */}
+        {/* User Profile */}
         <div style={styles.profile}>
           <img
             src={
@@ -67,7 +78,9 @@ export default function Navbar() {
             alt="profile"
             style={styles.avatar}
           />
-          <span>{user?.name || "Student"}</span>
+          <span style={styles.username}>
+            {user?.name || "Student"}
+          </span>
         </div>
 
         {/* Logout */}
@@ -80,47 +93,57 @@ export default function Navbar() {
   );
 }
 
+// ==========================
+// Styles
+// ==========================
 const styles = {
   container: {
     height: "70px",
     width: "100%",
-    background: "rgba(30, 41, 59, 0.8)",
+    background: "rgba(30, 41, 59, 0.85)",
     backdropFilter: "blur(10px)",
     display: "flex",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: "0 25px",
+    padding: "0 20px",
     color: "white",
     borderBottom: "1px solid #1f2937",
     position: "sticky",
     top: 0,
     zIndex: 1000
   },
+
   left: {
     display: "flex",
     alignItems: "center",
-    gap: "20px"
+    gap: "15px"
   },
+
   clock: {
-    fontSize: "14px",
+    fontSize: "13px",
     opacity: 0.8
   },
+
   right: {
     display: "flex",
     alignItems: "center",
-    gap: "20px"
+    gap: "15px",
+    flexWrap: "wrap"
   },
+
   badge: {
     background: "#6366f1",
     padding: "6px 12px",
     borderRadius: "20px",
-    fontSize: "13px",
+    fontSize: "12px",
     fontWeight: "bold"
   },
+
   icon: {
     cursor: "pointer",
     fontSize: "18px"
   },
+
   iconBtn: {
     background: "none",
     border: "none",
@@ -128,17 +151,24 @@ const styles = {
     cursor: "pointer",
     fontSize: "18px"
   },
+
   profile: {
     display: "flex",
     alignItems: "center",
-    gap: "10px"
+    gap: "8px"
   },
+
   avatar: {
     width: "35px",
     height: "35px",
     borderRadius: "50%",
     objectFit: "cover"
   },
+
+  username: {
+    fontSize: "14px"
+  },
+
   logoutBtn: {
     background: "#ef4444",
     border: "none",

@@ -41,64 +41,66 @@ export default function Signup() {
 
       setOtpSent(true);
       setMessage("OTP Sent to Email 📩");
-      setLoading(false);
-
     } catch (err) {
-      setLoading(false);
       setMessage(
         err.response?.data?.message || "Failed to send OTP"
       );
+    } finally {
+      setLoading(false);
     }
   };
 
   // ================= REGISTER =================
-const handleSignup = async (e) => {
-  e.preventDefault();
+  const handleSignup = async (e) => {
+    e.preventDefault();
 
-  try {
-    setLoading(true);
-    setMessage("");
+    try {
+      setLoading(true);
+      setMessage("");
 
-    // STEP 1: VERIFY OTP FIRST
-    await API.post("/auth/verify-otp", {
-      email: formData.email,
-      otp: formData.otp
-    });
+      // STEP 1: VERIFY OTP
+      await API.post("/auth/verify-otp", {
+        email: formData.email,
+        otp: formData.otp
+      });
 
-    // STEP 2: THEN COMPLETE SIGNUP
-    await API.post("/auth/signup", {
-      name: formData.name,
-      age: formData.age,
-      email: formData.email,
-      phone: formData.phone,
-      password: formData.password,
-      examType: "Banking"
-    });
+      // STEP 2: COMPLETE SIGNUP
+      await API.post("/auth/signup", {
+        name: formData.name,
+        age: formData.age,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+        examType: "Banking"
+      });
 
-    setLoading(false);
-    alert("Signup Successful 🎉");
-    navigate("/login");
+      alert("Signup Successful 🎉");
+      navigate("/login");
 
-  } catch (err) {
-    setLoading(false);
-    setMessage(
-      err.response?.data?.message || "Signup failed"
-    );
-  }
-};
+    } catch (err) {
+      setMessage(
+        err.response?.data?.message || "Signup failed"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div style={styles.container}>
       <div style={styles.card}>
-        <h2>🔥 NEET Pro Signup</h2>
+        <h2 style={{ marginBottom: "20px" }}>🔥 NEET Pro Signup</h2>
 
         {message && <p style={styles.message}>{message}</p>}
 
         <form onSubmit={handleSignup}>
+
           <input
             type="text"
             name="name"
             placeholder="Full Name"
             required
+            value={formData.name}
             onChange={handleChange}
             style={styles.input}
           />
@@ -108,6 +110,7 @@ const handleSignup = async (e) => {
             name="age"
             placeholder="Age"
             required
+            value={formData.age}
             onChange={handleChange}
             style={styles.input}
           />
@@ -117,6 +120,7 @@ const handleSignup = async (e) => {
             name="email"
             placeholder="Valid Email"
             required
+            value={formData.email}
             onChange={handleChange}
             style={styles.input}
           />
@@ -126,6 +130,7 @@ const handleSignup = async (e) => {
             name="phone"
             placeholder="Phone Number"
             required
+            value={formData.phone}
             onChange={handleChange}
             style={styles.input}
           />
@@ -135,6 +140,7 @@ const handleSignup = async (e) => {
             name="password"
             placeholder="Password"
             required
+            value={formData.password}
             onChange={handleChange}
             style={styles.input}
           />
@@ -155,6 +161,7 @@ const handleSignup = async (e) => {
                 name="otp"
                 placeholder="Enter OTP"
                 required
+                value={formData.otp}
                 onChange={handleChange}
                 style={styles.input}
               />
@@ -170,7 +177,7 @@ const handleSignup = async (e) => {
           )}
         </form>
 
-        <p style={{ marginTop: "15px" }}>
+        <p style={{ marginTop: "20px" }}>
           Already have account?{" "}
           <Link to="/login" style={styles.link}>
             Sign In
@@ -181,6 +188,9 @@ const handleSignup = async (e) => {
   );
 }
 
+// ==========================
+// Styles
+// ==========================
 const styles = {
   container: {
     minHeight: "100vh",
@@ -204,7 +214,9 @@ const styles = {
     padding: "12px",
     marginBottom: "12px",
     borderRadius: "8px",
-    border: "none"
+    border: "none",
+    background: "#334155",
+    color: "white"
   },
   button: {
     width: "100%",
@@ -212,7 +224,9 @@ const styles = {
     background: "#10b981",
     color: "white",
     border: "none",
-    borderRadius: "8px"
+    borderRadius: "8px",
+    cursor: "pointer",
+    fontWeight: "bold"
   },
   secondaryBtn: {
     width: "100%",
@@ -220,11 +234,14 @@ const styles = {
     background: "#6366f1",
     color: "white",
     border: "none",
-    borderRadius: "8px"
+    borderRadius: "8px",
+    cursor: "pointer",
+    fontWeight: "bold"
   },
   message: {
     color: "#facc15",
-    marginBottom: "10px"
+    marginBottom: "10px",
+    fontSize: "14px"
   },
   link: {
     color: "#6366f1",
