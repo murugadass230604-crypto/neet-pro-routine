@@ -306,7 +306,7 @@ const sendResetOtp = async (req, res) => {
     await user.save();
 
     await transporter.sendMail({
-      from: `"NEET Pro" <${process.env.BREVO_USER}>`,
+      from: `"NEET Pro" <murugadass230604gmail.com>`,
       to: email,
       subject: "Password Reset OTP",
       html: `<h2>Your Reset OTP: ${otp}</h2>`
