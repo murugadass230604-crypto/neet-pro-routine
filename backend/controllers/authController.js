@@ -1,7 +1,7 @@
 const User = require("../models/User");
 const Schedule = require("../models/Schedule");
 const jwt = require("jsonwebtoken");
-const nodemailer = require("nodemailer");
+const axios = require("axios");
 
 // ==========================
 // 🔐 Generate JWT
@@ -13,44 +13,6 @@ const generateToken = (user) => {
     { expiresIn: process.env.JWT_EXPIRE || "7d" }
   );
 };
-
-// ==========================
-// 📧 MAIL TRANSPORTER
-// ==========================
-// ==========================
-// 📧 MAIL TRANSPORTER (FIXED FOR RENDER)
-// ==========================
-const transporter = nodemailer.createTransport({
-  host: process.env.BREVO_HOST || "smtp-relay.brevo.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.BREVO_USER,
-    pass: process.env.BREVO_PASS
-  },
-  tls: {
-    rejectUnauthorized: false
-  },
-  connectionTimeout: 10000, // 10 sec
-  greetingTimeout: 10000,
-  socketTimeout: 10000
-});
-
-console.log("BREVO_USER:", process.env.BREVO_USER);
-console.log("BREVO_PASS exists:", !!process.env.BREVO_PASS);
-
-// ==========================
-// SMTP VERIFY (ONLY IN DEV)
-// ==========================
-if (process.env.NODE_ENV !== "production") {
-  transporter.verify((error, success) => {
-    if (error) {
-      console.log("❌ SMTP Error:", error);
-    } else {
-      console.log("✅ SMTP Server is ready");
-    }
-  });
-}
 
 // ==========================
 // 📧 SEND SIGNUP OTP
@@ -81,23 +43,27 @@ const sendOtp = async (req, res) => {
 
     user.otp = otp;
     user.otpExpiry = Date.now() + 5 * 60 * 1000;
+
     await user.save();
 
-try {
-  await transporter.sendMail({
-    from: `"NEET Pro" <murugadass230604@gmail.com>`,
-    to: email,
-    subject: "NEET Pro Signup OTP",
-    html: `<h2>Your OTP: ${otp}</h2><p>Valid for 5 minutes</p>`
-  });
-}
-catch (mailError) {
-  console.error("🔥 FULL SMTP ERROR:", mailError);
-  return res.status(500).json({
-    success: false,
-    message: mailError.message
-  });
-}
+    await axios.post(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        sender: {
+          name: "NEET Pro",
+          email: "murugadass230604@gmail.com"
+        },
+        to: [{ email }],
+        subject: "NEET Pro Signup OTP",
+        htmlContent: `<h2>Your OTP: ${otp}</h2><p>Valid for 5 minutes</p>`
+      },
+      {
+        headers: {
+          "api-key": process.env.BREVO_API_KEY,
+          "Content-Type": "application/json"
+        }
+      }
+    );
 
     res.json({
       success: true,
@@ -105,7 +71,7 @@ catch (mailError) {
     });
 
   } catch (error) {
-    console.error("Signup OTP Error:", error);
+    console.error("BREVO ERROR:", error.response?.data || error.message);
     res.status(500).json({
       success: false,
       message: "Failed to send OTP"
@@ -114,7 +80,7 @@ catch (mailError) {
 };
 
 // ==========================
-// 🔥 VERIFY OTP ONLY
+// 🔥 VERIFY OTP
 // ==========================
 const verifyOtp = async (req, res) => {
   try {
@@ -122,14 +88,7 @@ const verifyOtp = async (req, res) => {
 
     const user = await User.findOne({ email }).select("+otp +otpExpiry");
 
-    if (!user) {
-      return res.status(400).json({
-        success: false,
-        message: "User not found"
-      });
-    }
-
-    if (user.otp !== otp) {
+    if (!user || user.otp !== otp) {
       return res.status(400).json({
         success: false,
         message: "Invalid OTP"
@@ -142,11 +101,12 @@ const verifyOtp = async (req, res) => {
         message: "OTP Expired"
       });
     }
-    
-user.isVerified = true;
-user.otp = undefined;
-user.otpExpiry = undefined;
-await user.save();
+
+    user.isVerified = true;
+    user.otp = undefined;
+    user.otpExpiry = undefined;
+
+    await user.save();
 
     res.json({
       success: true,
@@ -154,7 +114,6 @@ await user.save();
     });
 
   } catch (error) {
-    console.error("Verify OTP Error:", error);
     res.status(500).json({
       success: false,
       message: "Verification failed"
@@ -163,27 +122,20 @@ await user.save();
 };
 
 // ==========================
-// 🔥 VERIFY OTP + REGISTER
+// 🔥 SIGNUP
 // ==========================
 const signup = async (req, res) => {
   try {
     const { name, age, email, phone, password, examType } = req.body;
 
-  const user = await User.findOne({ email }).select("+otp +otpExpiry");
+    const user = await User.findOne({ email });
 
-if (!user) {
-  return res.status(400).json({
-    success: false,
-    message: "User not found. Request OTP first."
-  });
-}
-
-if (!user.isVerified) {
-  return res.status(400).json({
-    success: false,
-    message: "Please verify OTP first"
-  });
-}
+    if (!user || !user.isVerified) {
+      return res.status(400).json({
+        success: false,
+        message: "Verify OTP first"
+      });
+    }
 
     // ✅ Update user details
     user.name = name;
@@ -191,30 +143,33 @@ if (!user.isVerified) {
     user.phone = phone;
     user.password = password;
     user.examType = examType;
-    user.isVerified = true;
-    user.otp = undefined;
-    user.otpExpiry = undefined;
 
-    await user.save();
+await user.save();
 
-    // ✅ DEFAULT ROUTINE
-    await Schedule.create({
-      userId: user._id,
-      date: new Date(),
-      tasks: [
-        { title: "Wake Up", startTime: "05:00", endTime: "05:15", category: "Other", icon: "🌅" },
-        { title: "Exercise", startTime: "05:15", endTime: "05:45", category: "Exercise", icon: "🏃" },
-        { title: "Meditation", startTime: "05:45", endTime: "06:00", category: "Meditation", icon: "🧘" },
-        { title: "Breakfast", startTime: "08:00", endTime: "08:30", category: "Meal", icon: "🍳" },
-        { title: "Study Session 1", startTime: "09:00", endTime: "12:00", category: "Study", icon: "📚" },
-        { title: "Lunch", startTime: "12:30", endTime: "13:00", category: "Meal", icon: "🍛" },
-        { title: "Power Nap", startTime: "13:00", endTime: "13:30", category: "Sleep", icon: "😴" },
-        { title: "Workout", startTime: "17:00", endTime: "18:00", category: "Exercise", icon: "💪" },
-        { title: "Study Session 2", startTime: "19:00", endTime: "21:00", category: "Study", icon: "📖" },
-        { title: "Dinner", startTime: "21:00", endTime: "21:30", category: "Meal", icon: "🍽" },
-        { title: "Bed Time", startTime: "22:00", endTime: "05:00", category: "Sleep", icon: "🌙" }
-      ]
-    });
+// ✅ Check if schedule already exists
+const existingSchedule = await Schedule.findOne({
+  userId: user._id
+});
+
+if (!existingSchedule) {
+  await Schedule.create({
+    userId: user._id,
+    date: new Date(),
+    tasks: [
+      { title: "Wake Up", startTime: "05:00", endTime: "05:15", category: "Other", icon: "🌅" },
+      { title: "Exercise", startTime: "05:15", endTime: "05:45", category: "Exercise", icon: "🏃" },
+      { title: "Meditation", startTime: "05:45", endTime: "06:00", category: "Meditation", icon: "🧘" },
+      { title: "Breakfast", startTime: "08:00", endTime: "08:30", category: "Meal", icon: "🍳" },
+      { title: "Study Session 1", startTime: "09:00", endTime: "12:00", category: "Study", icon: "📚" },
+      { title: "Lunch", startTime: "12:30", endTime: "13:00", category: "Meal", icon: "🍛" },
+      { title: "Power Nap", startTime: "13:00", endTime: "13:30", category: "Sleep", icon: "😴" },
+      { title: "Workout", startTime: "17:00", endTime: "18:00", category: "Exercise", icon: "💪" },
+      { title: "Study Session 2", startTime: "19:00", endTime: "21:00", category: "Study", icon: "📖" },
+      { title: "Dinner", startTime: "21:00", endTime: "21:30", category: "Meal", icon: "🍽" },
+      { title: "Bed Time", startTime: "22:00", endTime: "05:00", category: "Sleep", icon: "🌙" }
+    ]
+  });
+}
 
     const token = generateToken(user);
 
@@ -275,7 +230,6 @@ const login = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Login Error:", error);
     res.status(500).json({
       success: false,
       message: "Login failed"
@@ -306,12 +260,24 @@ const sendResetOtp = async (req, res) => {
 
     await user.save();
 
-    await transporter.sendMail({
-      from: `"NEET Pro" <murugadass230604gmail.com>`,
-      to: email,
-      subject: "Password Reset OTP",
-      html: `<h2>Your Reset OTP: ${otp}</h2>`
-    });
+    await axios.post(
+      "https://api.brevo.com/v3/smtp/email",
+      {
+        sender: {
+          name: "NEET Pro",
+          email: "murugadass230604@gmail.com"
+        },
+        to: [{ email }],
+        subject: "Password Reset OTP",
+        htmlContent: `<h2>Your Reset OTP: ${otp}</h2>`
+      },
+      {
+        headers: {
+          "api-key": process.env.BREVO_API_KEY,
+          "Content-Type": "application/json"
+        }
+      }
+    );
 
     res.json({
       success: true,
@@ -319,7 +285,6 @@ const sendResetOtp = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Reset OTP Error:", error);
     res.status(500).json({
       success: false,
       message: "Failed to send reset OTP"
@@ -362,7 +327,6 @@ const resetPassword = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Reset Password Error:", error);
     res.status(500).json({
       success: false,
       message: "Reset failed"
@@ -371,20 +335,13 @@ const resetPassword = async (req, res) => {
 };
 
 // ==========================
-// 👤 GET LOGGED-IN USER
+// 👤 GET PROFILE
 // ==========================
 const getMe = async (req, res) => {
-  try {
-    res.json({
-      success: true,
-      user: req.user
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: "Failed to fetch user"
-    });
-  }
+  res.json({
+    success: true,
+    user: req.user
+  });
 };
 
 // ==========================
@@ -409,7 +366,6 @@ const updateProfile = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Update Profile Error:", error);
     res.status(500).json({
       success: false,
       message: "Update failed"

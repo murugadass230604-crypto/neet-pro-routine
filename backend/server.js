@@ -24,13 +24,17 @@ app.use(helmet());
 // ==========================
 // 🌍 CORS CONFIGURATION
 // ==========================
-
 app.use(
   cors({
-    origin: "*", // 🔥 allow all for mobile testing
+    origin: "*", // For testing (restrict in production)
     credentials: true
   })
 );
+
+// ==========================
+// 🔥 TRUST PROXY (RENDER FIX)
+// ==========================
+app.set("trust proxy", 1);
 
 // ==========================
 // 📦 BODY PARSER
@@ -42,8 +46,10 @@ app.use(express.urlencoded({ extended: true }));
 // 🚦 RATE LIMIT
 // ==========================
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 100,
+  windowMs: 15 * 60 * 1000, // 15 mins
+  max: 100, // limit each IP
+  standardHeaders: true,
+  legacyHeaders: false,
   message: {
     success: false,
     message: "Too many requests. Try again later."
@@ -98,7 +104,7 @@ app.use((req, res) => {
 // 🔥 GLOBAL ERROR HANDLER
 // ==========================
 app.use((err, req, res, next) => {
-  console.error("🔥 Server Error:", err.stack);
+  console.error("🔥 Server Error:", err);
 
   res.status(err.statusCode || 500).json({
     success: false,
@@ -107,7 +113,7 @@ app.use((err, req, res, next) => {
 });
 
 // ==========================
-// 🚀 START SERVER (🔥 IMPORTANT FIX HERE)
+// 🚀 START SERVER
 // ==========================
 const PORT = process.env.PORT || 5000;
 
